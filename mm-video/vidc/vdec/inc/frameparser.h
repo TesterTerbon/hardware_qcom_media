@@ -37,7 +37,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 enum codec_type
 {
     CODEC_TYPE_MPEG4 = 0,
-    CODEC_TYPE_DIVX = 0,
     CODEC_TYPE_H263 = 1,
     CODEC_TYPE_H264 = 2,
     CODEC_TYPE_VC1 = 3
@@ -49,8 +48,7 @@ enum state_start_code_parse
    A1,
    A2,
    A3,
-   A4,
-   A5
+   A4
 };
 
 enum state_nal_parse
@@ -65,30 +63,32 @@ class frame_parse
 public:
 	H264_Utils *mutils;
 	int init_start_codes (codec_type codec_type_parse);
-	int parse_sc_frame (OMX_BUFFERHEADERTYPE *source,
+	int parse_mpeg4_frame (OMX_BUFFERHEADERTYPE *source,
                          OMX_BUFFERHEADERTYPE *dest ,
 						             OMX_U32 *partialframe);
 	int init_nal_length (unsigned int nal_length);
 	int parse_h264_nallength (OMX_BUFFERHEADERTYPE *source,
 		                        OMX_BUFFERHEADERTYPE *dest ,
 							              OMX_U32 *partialframe);
-	void flush ();
+  void flush ();
+  void update_metadata (OMX_S64 time_stamp ,unsigned int flags);
 	 frame_parse ();
 	~frame_parse ();
 
 private:
    /*Variables for Start code based Parsing*/
    enum state_start_code_parse parse_state;
-   unsigned char *start_code;
-   unsigned char *mask_code;
-   unsigned char last_byte_h263;
-   unsigned char last_byte;
+   unsigned char start_code[4];
+   char mask_code[4];
+   unsigned char last_byte,prev_one;
 
    /*Variables for NAL Length Parsing*/
    enum state_nal_parse state_nal;
    unsigned int nal_length;
    unsigned int accum_length;
    unsigned int bytes_tobeparsed;
+   OMX_S64 time_stamp;
+   unsigned int flags;
 };
 
 #endif /* FRAMEPARSER_H */

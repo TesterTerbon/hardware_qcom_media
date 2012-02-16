@@ -368,6 +368,7 @@ qc_omx_component_deinit(OMX_IN OMX_HANDLETYPE hComp)
     eRet = pThis->component_deinit(hComp);
     // destroy the component.
     delete pThis;
+    ((OMX_COMPONENTTYPE *)hComp)->pComponentPrivate = NULL;
   }
   return eRet;
 }
